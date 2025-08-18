@@ -13,7 +13,7 @@
     >
       <div class="logo-section" >
         <div class="logo-full">
-           <img src="@/assets/img/logo-.svg" alt="logo">
+           <img src="@/assets/img/logo.svg" alt="logo">
         </div>
       </div>
 
@@ -127,45 +127,23 @@ const authStore = useAuthStore()
 const profileStore = useProfileStore()
 const drawer = ref(true)
 const rail = ref(false)
-const darkMode = ref(true)
 
-const paymentItems = [
-  { title: 'Оплата', icon: '/img/sidebar/payment.svg', to: '/payment' },
-  { title: 'История транзакций',  icon: '/img/sidebar/transactions.svg', to: '/transactions' },
-]
-
-const reportItems = [
-  { title: 'Реестр операций', icon: '/img/sidebar/operations-registry.svg', to: '/operations-registry' },
-  { title: 'История баланса', icon: '/img/sidebar/balance-history.svg', to: '/balance-history' },
-]
-
-const profileItems = [
-  { title: 'Профиль', icon: '/img/sidebar/profile.svg', to: '/profile' },
-  { title: 'Статистика', icon: '/img/sidebar/statistics.svg', to: '/statistics' },
-]
-  const userRoles = computed(() => authStore.user?.roles || [])
+const userRoles = computed(() => authStore.user?.roles || [])
 
 const menuItems = computed(() => {
   const items = [
-    { title: 'Главная', icon: '/img/sidebar/statistics.svg', to: '/', show: userRoles.value },
-    { title: 'SMS Главная', icon: '/img/sidebar/home.svg', to: '/transactions', show: userRoles.value.includes('ROLE_BRANCH') || userRoles.value.includes('ROLE_SERVICE') || userRoles.value.includes('ROLE_ADMIN') },
-    { title: 'SMS шаблоны', icon: '/img/sidebar/sms-frame.svg', to: '/operations-registry', show: userRoles.value.includes('ROLE_BRANCH') || userRoles.value.includes('ROLE_SERVICE') || userRoles.value.includes('ROLE_ADMIN') },
+    { title: 'Статистика', icon: '/img/sidebar/statistics.svg', to: '/statistics', show: userRoles.value },
+    { title: 'Главная', icon: '/img/sidebar/home.svg', to: '/main', show: userRoles.value },
+    { title: 'SMS шаблоны', icon: '/img/sidebar/sms-frame.svg', to: '/frames', show: userRoles.value },
   ]
-  // ROLE_ADMIN uchun "Оплата" ni yashirish
  
   return items.filter(i => i.show)
 })
 const currentPageTitle = computed(() => {
   const titles: Record<string, string> = {
-    '/': 'Сводный отчет',
-    '/payment': 'Оплата',
-    '/transactions': 'История транзакций',
-    '/summary-report': 'Сводный отчет',
-    '/operations-registry': 'Реестр операций',
-    '/balance-history': 'История баланса',
-    '/profile': 'Профиль',
     '/statistics': 'Статистика',
-    '/users': 'Пользователи',
+    '/main': 'Главная',
+    '/frames': 'SMS шаблоны'
   }
   return titles[route.path] || 'Dashboard'
 })

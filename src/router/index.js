@@ -22,18 +22,18 @@ const router = createRouter({
       meta: { requiresAuth: true },
       children: [
         {
-          path: '/sms',
-          name: 'Dashboard',
-          component: () => import('@/views/DashboardView.vue')
-        },
-        {
-          path: '/sms-frame',
-          name: 'OperationsRegistry',
-          component: () => import('@/views/OperationsRegistry.vue')
-        },
-        {
           path: '/statistics',
-          name: 'Statistics',
+          name: 'Статистика',
+          component: () => import('@/views/StatisticsView.vue')
+        },
+        {
+          path: '/main',
+          name: 'Главная',
+          component: () => import('@/views/StatisticsView.vue')
+        },
+        {
+          path: '/frames',
+          name: 'SMS шаблоны',
           component: () => import('@/views/StatisticsView.vue')
         }
       ]
