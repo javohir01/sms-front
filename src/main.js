@@ -7,6 +7,9 @@ import { createVuetify } from 'vuetify'
 import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
 import { aliases, mdi } from 'vuetify/iconsets/mdi'
+import ElementPlus from 'element-plus'
+import 'element-plus/dist/index.css'
+import ru from 'element-plus/dist/locale/ru.mjs'
 import '@mdi/font/css/materialdesignicons.css'
 import './assets/main.css'
 import 'vuetify/styles'
@@ -50,7 +53,11 @@ const vuetify = createVuetify({
 })
 
 const app = createApp(App)
-app.use(createPinia())
-   .use(router)
-   .use(vuetify)
-   .mount('#app')
+app
+  .use(createPinia())
+  .use(router)
+  .use(vuetify)
+  .use(ElementPlus, {
+    locale: ru,
+  })
+  .mount('#app')

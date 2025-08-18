@@ -133,7 +133,7 @@ const userRoles = computed(() => authStore.user?.roles || [])
 const menuItems = computed(() => {
   const items = [
     { title: 'Статистика', icon: '/img/sidebar/statistics.svg', to: '/statistics', show: userRoles.value },
-    { title: 'Главная', icon: '/img/sidebar/home.svg', to: '/main', show: userRoles.value },
+    { title: 'SMS Главная', icon: '/img/sidebar/home.svg', to: '/main', show: userRoles.value },
     { title: 'SMS шаблоны', icon: '/img/sidebar/sms-frame.svg', to: '/frames', show: userRoles.value },
   ]
  
@@ -142,7 +142,7 @@ const menuItems = computed(() => {
 const currentPageTitle = computed(() => {
   const titles: Record<string, string> = {
     '/statistics': 'Статистика',
-    '/main': 'Главная',
+    '/main': 'SMS Главная',
     '/frames': 'SMS шаблоны'
   }
   return titles[route.path] || 'Dashboard'

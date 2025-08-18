@@ -29,12 +29,12 @@ const router = createRouter({
         {
           path: '/main',
           name: 'Главная',
-          component: () => import('@/views/StatisticsView.vue')
+          component: () => import('@/views/SmsMain.vue')
         },
         {
           path: '/frames',
           name: 'SMS шаблоны',
-          component: () => import('@/views/StatisticsView.vue')
+          component: () => import('@/views/SmsFrames.vue')
         }
       ]
     }

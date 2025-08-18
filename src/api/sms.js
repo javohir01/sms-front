@@ -1,8 +1,8 @@
 import axiosInstance from "@/utils/axios.js";
 
-export async function getMe() {
+export async function sms() {
     return axiosInstance({
-        url: `/v1/profile/getMe`,
+        url: `/report/sms`,
         method: 'GET',
     })
 }
