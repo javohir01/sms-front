@@ -44,16 +44,15 @@
     <!-- Filter Modal -->
     <el-dialog v-model="showFilterModal" title="Фильтры" width="400px">
       <div>
-        <el-input v-model="filter.comment" placeholder="Комментарий" style="margin-bottom: 12px;" />
-        <el-date-picker
-          v-model="dateRange"
-          type="daterange"
-          range-separator=" - "
-          start-placeholder="Дата от"
-          end-placeholder="Дата до"
-          style="margin-bottom: 12px;"
-        />
-        <!-- Qo'shimcha filterlar -->
+        <el-select v-model="filter.operator" placeholder="По оператору" style="margin-bottom: 12px; width: 100%;" clearable>
+          <el-option v-for="item in operatorOptions" :key="item.value" :label="item.label" :value="item.value" />
+        </el-select>
+        <el-select v-model="filter.status" placeholder="По статусу" style="margin-bottom: 12px; width: 100%;" clearable>
+          <el-option v-for="item in statusOptions" :key="item.value" :label="item.label" :value="item.value" />
+        </el-select>
+        <el-select v-model="filter.sender" placeholder="По отправителю" style="margin-bottom: 12px; width: 100%;" clearable>
+          <el-option v-for="item in senderOptions" :key="item.value" :label="item.label" :value="item.value" />
+        </el-select>
       </div>
       <template #footer>
         <el-button @click="clearFilter">Сбросить</el-button>
@@ -89,11 +88,11 @@
         </template>
 
         <template #item.amount="{ item }">
-<!--          <span class="amount-text" :class="{ 'negative': String(item.amount).includes('-') }">-->
-<!--           {{ (item.type == 'INCOME'?'': '-') + formatSum(item.amount) }}-->
-<!--          </span>-->
+          <span class="amount-text">{{ item.amount }}</span>
         </template>
-
+        <template #item.status="{ item }">
+          <span>{{ item.status }}</span>
+        </template>
         <template #item.createdDate="{ item }">
           <span class="date-text">{{ new Date(item.createdDate).toLocaleString() }}</span>
         </template>
@@ -134,7 +133,10 @@ const isLoading = ref(false)
 const totalItems = ref(0)
 const dateRange = ref('')
 const filter = ref({
-  comment:"",
+  comment: "",
+  operator: null,
+  status: null,
+  sender: null,
   fromDate: null,
   toDate: null
 })
@@ -150,6 +152,25 @@ const headers = [
   { title: 'Дата', key: 'createdDate', width: '180px' },
 ]
 
+const operatorOptions = [
+  { label: 'beeline', value: 'beeline' },
+  { label: 'perfectum', value: 'perfectum' },
+  { label: 'uzmobile.gsm', value: 'uzmobile.gsm' },
+  { label: 'uzmobile.cdma', value: 'uzmobile.cdma' },
+  { label: 'ucell', value: 'ucell' }
+]
+
+const statusOptions = [
+  { label: 'Ожидает', value: 'pending' },
+  { label: 'Завершено', value: 'completed' },
+  { label: 'Отменено', value: 'canceled' },
+  { label: 'Не доставлено', value: 'undelivered' }
+]
+
+const senderOptions = [
+  { label: '22700', value: '22700' },
+  { label: 'QuickPay', value: 'quickpay' }
+]
 watch([page, itemsPerPage], () => {
   fetchSms()
 })
@@ -258,6 +279,6 @@ onMounted(() => {
 .filter-bar .el-date-editor.el-input__wrapper{
   box-shadow: none !important;
   padding: 0;
-  width: max-content;
+  width: 140% !important;
 }
 </style>
