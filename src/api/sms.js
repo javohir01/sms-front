@@ -1,9 +1,10 @@
 import axiosInstance from "@/utils/axios.js";
 
-export async function sms() {
+export async function sms(params) {
     return axiosInstance({
         url: `/report/sms`,
         method: 'GET',
+        params
     })
 }
 export async function updateProfileApi(data) {

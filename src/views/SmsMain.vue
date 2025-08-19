@@ -10,15 +10,11 @@
           start-placeholder="Начало"
           end-placeholder="Конец"
           size="large"
-          format="YYYY-MM-DD HH:mm:ss"
+          format="YYYY-MM-DD"
           :prefix-icon="CalendarIcon"
-        >
-          <!-- <template #prefix>
-            <img src="/img/calendar.svg" style="width: 18px; height: 18px;" />
-          </template> -->
-        </el-date-picker>
+        />
         <el-input
-          v-model.lazy="filter.comment"
+          v-model.lazy="filter.search"
           class="filter-search"
           size="large"
           placeholder="Поиск"
@@ -44,14 +40,44 @@
     <!-- Filter Modal -->
     <el-dialog v-model="showFilterModal" title="Фильтры" width="400px">
       <div>
-        <el-select v-model="filter.operator" placeholder="По оператору" style="margin-bottom: 12px; width: 100%;" clearable>
-          <el-option v-for="item in operatorOptions" :key="item.value" :label="item.label" :value="item.value" />
+        <el-select
+          v-model="filter.operator"
+          placeholder="По оператору"
+          style="margin-bottom: 12px; width: 100%;"
+          clearable
+        >
+          <el-option
+            v-for="item in resourceStore.operators"
+            :key="item.id"
+            :label="item.name"
+            :value="item.id"
+          />
         </el-select>
-        <el-select v-model="filter.status" placeholder="По статусу" style="margin-bottom: 12px; width: 100%;" clearable>
-          <el-option v-for="item in statusOptions" :key="item.value" :label="item.label" :value="item.value" />
+        <el-select
+          v-model="filter.status"
+          placeholder="По статусу"
+          style="margin-bottom: 12px; width: 100%;"
+          clearable
+        >
+          <el-option
+            v-for="item in statusOptions"
+            :key="item"
+            :label="item"
+            :value="item"
+          />
         </el-select>
-        <el-select v-model="filter.sender" placeholder="По отправителю" style="margin-bottom: 12px; width: 100%;" clearable>
-          <el-option v-for="item in senderOptions" :key="item.value" :label="item.label" :value="item.value" />
+        <el-select
+          v-model="filter.merchant"
+          placeholder="По отправителю"
+          style="margin-bottom: 12px; width: 100%;"
+          clearable
+        >
+          <el-option
+            v-for="item in resourceStore.merchants"
+            :key="item.merchant"
+            :label="item.merchantId"
+            :value="item.merchant"
+          />
         </el-select>
       </div>
       <template #footer>
@@ -66,8 +92,8 @@
         :headers="headers"
         :items="smsStore?.smses?.content"
         :loading="smsStore.loading"
-        :items-per-page="parseInt(itemsPerPage)"
-        :page.sync="page"
+        :items-per-page="parseInt(filter.size)"
+        :page.sync="filter.page"
         :server-items-length="totalItems"
         hide-default-footer
         class="balance-table"
@@ -101,12 +127,25 @@
       <div class="d-flex justify-space-between mt-4 ml-4 mb-2">
         <div class="d-flex align-center" style="gap:8px">
           <span class="pagination-text">Показано</span>
-          <span style="border:1px solid #D1D5DB; padding: 10px; border-radius: 14px;">{{ page }}</span>
-          <span class="pagination-text">из {{ smsStore?.smses?.totalPages }}</span>          
+            <el-select
+              v-model="filter.size"
+              placeholder="Период"
+              size="large"
+              class="pagination-select"
+              @update:modelValue="onPageChange"
+            >
+              <el-option
+                v-for="item in itemsPerPageOptions"
+                :key="item + 'page'"
+                :label="item"
+                :value="item"
+              />
+            </el-select>
+          <span class="pagination-text d-flex">из {{ smsStore?.smses?.totalElements }}</span>
         </div>
         <v-pagination
-          v-model="page"
-          :length="smsStore?.smses?.totalPages || lastPage"
+          v-model="filter.page"
+          :length="smsStore?.smses?.totalPages"
           :total-visible="5"
           color="primary"
           size="small"
@@ -121,24 +160,25 @@
 import { ref, h, watch, onMounted } from 'vue'
 import { ElDatePicker, ElInput, ElButton, ElDialog } from 'element-plus'
 import {useSmsStore} from "@/stores/sms";
+import {useResourceStore} from "@/stores/resource";
+import {formatDateToIso} from "@/utils/helpers";
 
 const smsStore = useSmsStore()
+const resourceStore = useResourceStore()
 
-const page = ref(1)
-const lastPage = ref(1)
 const itemsPerPageOptions = ['5', '10', '20', '50']
-const itemsPerPage = ref('5')
-const searchQuery = ref('')
 const isLoading = ref(false)
 const totalItems = ref(0)
 const dateRange = ref('')
 const filter = ref({
-  comment: "",
+  size: 10,
+  page: 1,
+  search: "",
   operator: null,
   status: null,
-  sender: null,
-  fromDate: null,
-  toDate: null
+  merchant: null,
+  startDate: null,
+  endDate: null
 })
 const showFilterModal = ref(false)
 const headers = [
@@ -151,63 +191,73 @@ const headers = [
   { title: 'Статус', key: 'amount', width: '200px' },
   { title: 'Дата', key: 'createdDate', width: '180px' },
 ]
-
-const operatorOptions = [
-  { label: 'beeline', value: 'beeline' },
-  { label: 'perfectum', value: 'perfectum' },
-  { label: 'uzmobile.gsm', value: 'uzmobile.gsm' },
-  { label: 'uzmobile.cdma', value: 'uzmobile.cdma' },
-  { label: 'ucell', value: 'ucell' }
-]
-
 const statusOptions = [
-  { label: 'Ожидает', value: 'pending' },
-  { label: 'Завершено', value: 'completed' },
-  { label: 'Отменено', value: 'canceled' },
-  { label: 'Не доставлено', value: 'undelivered' }
+  'CREATED',
+  'FAILED',
+  'NOT_FOUND',
+  'EXPIRED',
+  'TRANSMITTED',
+  'DELIVERED',
+  'REJECTED',
+  'NOT_DELIVERED'
 ]
-
-const senderOptions = [
-  { label: '22700', value: '22700' },
-  { label: 'QuickPay', value: 'quickpay' }
-]
-watch([page, itemsPerPage], () => {
-  fetchSms()
-})
 const CalendarIcon = () => h('img', {
   src: '/img/calendar.svg',
   style: 'width: 16px; height: 16px;'
 })
 
+watch([filter.value.page, filter.value.size], () => {
+  fetchSms()
+})
+watch(dateRange, (newVal) => {
+  filter.value.startDate = newVal?.[0] ? formatDateToIso(newVal[0]) : null
+  filter.value.endDate   = newVal?.[1] ? formatDateToIso(newVal[1]) : null
+  fetchSms()
+})
+
 const fetchSms = async () => {
   isLoading.value = true
   try {
-      const response = await smsStore.fetchSmses({
-        page: 1,
-        limit: itemsPerPage.value,
-        search: searchQuery.value,
-        fromDate: dateRange.value ? new Date(dateRange.value).toISOString() : null,
-      }).then(res => {
-        totalItems.value = res?.totalElements || 0
-        lastPage.value = Math.ceil(totalItems.value / parseInt(itemsPerPage.value))
-      })
-
+    await smsStore.fetchSmses({...filter.value})
+  } finally {
+    isLoading.value = false
+  }
+}
+const fetchOperators = () => {
+  isLoading.value = true
+  try {
+    resourceStore.fetchOperators()
+  } finally {
+    isLoading.value = false
+  }
+}
+const fetchMerchants = () => {
+  isLoading.value = true
+  try {
+    resourceStore.fetchMerchants()
   } finally {
     isLoading.value = false
   }
 }
 const onPageChange = (newPage: number) => {
-  page.value = newPage
+  filter.value.page = newPage
   fetchSms()
 }
 function clearFilter() {
-  dateRange.value = ''
-  itemsPerPage.value = '5'
-  filter.value.comment = ''
+  filter.value.page = 1
+  filter.value.size = 10
+  filter.value.operator = null
+  filter.value.status = null
+  filter.value.merchant = null
+  filter.value.startDate = null
+  filter.value.endDate = null
+  filter.value.search = ''
 }
 
 onMounted(() => {
   fetchSms()
+  fetchOperators()
+  fetchMerchants()
 })
 </script>
 
@@ -280,5 +330,12 @@ onMounted(() => {
   box-shadow: none !important;
   padding: 0;
   width: 140% !important;
+}
+.pagination-text{
+  white-space: nowrap!important;
+}
+el-select.pagination-select {
+  width: 70px!important;
+
 }
 </style>

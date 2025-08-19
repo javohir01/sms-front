@@ -9,10 +9,10 @@ export const useSmsStore = defineStore('sms', () => {
   const loading = ref(false)
   const error = ref(null)
 
-  const fetchSmses = async (params: {}) => {
+  const fetchSmses = async (params: any) => {
     loading.value = true
     try {
-      const response = await sms()
+      const response = await sms(params)
       console.log('SMSlar:', response)
       if (response?.status === 200) {
         console.log('SMSlar muvaffaqiyatli olindi:', response.data)
