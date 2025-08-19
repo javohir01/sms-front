@@ -5,7 +5,7 @@ import {
 } from '@/api/sms' 
 
 export const useSmsStore = defineStore('sms', () => {
-  const smses = ref([])
+  const smses = ref({})
   const loading = ref(false)
   const error = ref(null)
 
@@ -31,6 +31,9 @@ export const useSmsStore = defineStore('sms', () => {
   }
 
   return {
+    loading,
+    error,
+    smses,
     fetchSmses
   }
 })

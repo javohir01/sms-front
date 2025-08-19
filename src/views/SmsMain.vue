@@ -65,7 +65,7 @@
     <div class="table-container">
       <v-data-table
         :headers="headers"
-        :items="smsStore.smses"
+        :items="smsStore?.smses?.content"
         :loading="smsStore.loading"
         :items-per-page="parseInt(itemsPerPage)"
         :page.sync="page"
@@ -103,11 +103,11 @@
         <div class="d-flex align-center" style="gap:8px">
           <span class="pagination-text">Показано</span>
           <span style="border:1px solid #D1D5DB; padding: 10px; border-radius: 14px;">{{ page }}</span>
-          <span class="pagination-text">из {{ lastPage }}</span>          
+          <span class="pagination-text">из {{ smsStore?.smses?.totalPages }}</span>          
         </div>
         <v-pagination
           v-model="page"
-          :length="lastPage"
+          :length="smsStore?.smses?.totalPages || lastPage"
           :total-visible="5"
           color="primary"
           size="small"
@@ -119,19 +119,20 @@
 </template>
 
 <script setup lang="ts">
-import { ref, h, onMounted } from 'vue'
+import { ref, h, watch, onMounted } from 'vue'
 import { ElDatePicker, ElInput, ElButton, ElDialog } from 'element-plus'
 import {useSmsStore} from "@/stores/sms";
 
 const smsStore = useSmsStore()
 
-const dateRange = ref('')
+const page = ref(1)
+const lastPage = ref(1)
 const itemsPerPageOptions = ['5', '10', '20', '50']
 const itemsPerPage = ref('5')
-const lastPage = ref(1)
 const searchQuery = ref('')
 const isLoading = ref(false)
 const totalItems = ref(0)
+const dateRange = ref('')
 const filter = ref({
   comment:"",
   fromDate: null,
@@ -148,6 +149,10 @@ const headers = [
   { title: 'Статус', key: 'amount', width: '200px' },
   { title: 'Дата', key: 'createdDate', width: '180px' },
 ]
+
+watch([page, itemsPerPage], () => {
+  fetchSms()
+})
 const CalendarIcon = () => h('img', {
   src: '/img/calendar.svg',
   style: 'width: 16px; height: 16px;'
@@ -161,7 +166,6 @@ const fetchSms = async () => {
         limit: itemsPerPage.value,
         search: searchQuery.value,
         fromDate: dateRange.value ? new Date(dateRange.value).toISOString() : null,
-        toDate: dateRange2.value ? new Date(dateRange2.value).toISOString() : null
       }).then(res => {
         totalItems.value = res?.totalElements || 0
         lastPage.value = Math.ceil(totalItems.value / parseInt(itemsPerPage.value))
@@ -170,6 +174,10 @@ const fetchSms = async () => {
   } finally {
     isLoading.value = false
   }
+}
+const onPageChange = (newPage: number) => {
+  page.value = newPage
+  fetchSms()
 }
 function clearFilter() {
   dateRange.value = ''
@@ -182,7 +190,7 @@ onMounted(() => {
 })
 </script>
 
-<style scoped>
+<style>
 .filter-bar {
   display: flex;
   align-items: center;
@@ -205,8 +213,8 @@ onMounted(() => {
   background: transparent;
   border: none!important;
 }
-.el-date-editor .el-input__wrapper,
-.el-input__wrapper {
+.filter-bar .el-date-editor .el-input__wrapper,
+.filter-bar .el-input__wrapper {
   background: transparent;
   border: none!important;
   box-shadow: none!important;
@@ -240,11 +248,16 @@ onMounted(() => {
   margin-left: 4px;
   font-size: 16px;
 }
-.el-input-group__prepend{
+.filter-btn .el-button span {
+  margin-left: 25px;
+}
+.filter-bar .el-input-group__prepend{
   box-shadow: none!important;
   padding: 0;
 }
-.filter-btn .el-button span {
-  margin-left: 25px;
+.filter-bar .el-date-editor.el-input__wrapper{
+  box-shadow: none !important;
+  padding: 0;
+  width: max-content;
 }
 </style>

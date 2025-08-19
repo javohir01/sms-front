@@ -23,9 +23,9 @@
                 size="large"
                 placeholder="Поиск"
               >
-                <template #prepend>
+                <!-- <template> -->
                   <img src="/img/search.svg" style="width: 24px; height: 24px; margin-right: 8px;" />
-                </template>
+                <!-- </template> -->
               </el-input>
               </div>
               <div class="filter-group">
