@@ -1,13 +1,30 @@
+<template>
+  <div>
+    <div class="header">2025-05-30 00:00:00 - 2025-06-09 23:59:59</div>
+    <VChart :option="option" style="height: 200px;" />
+  </div>
+</template>
+
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import VChart from 'vue-echarts';
 import { use } from 'echarts/core';
 import { CanvasRenderer } from 'echarts/renderers';
 import { BarChart } from 'echarts/charts';
 import { TitleComponent, GridComponent } from 'echarts/components';
-
+import { useStatisticStore } from '@/stores/statistic';
 use([CanvasRenderer, BarChart, TitleComponent, GridComponent]);
 
+const statisticStore = useStatisticStore();
+
+const fetchByOperatorChart = async () => {
+  isLoading.value = true
+  try {
+    await statisticStore.fetchByOperatorChart({...filter.value})
+  } finally {
+    isLoading.value = false
+  }
+}
 const option = ref({
   title: {
     text: 'Количество SMS по статусам',
@@ -61,14 +78,11 @@ const option = ref({
     }
   ]
 });
-</script>
 
-<template>
-  <div>
-    <div class="header">2025-05-30 00:00:00 - 2025-06-09 23:59:59</div>
-    <VChart :option="option" style="height: 200px;" />
-  </div>
-</template>
+onMounted(() => {
+  fetchByOperatorChart()
+})
+</script>
 
 <style>
 .header {
