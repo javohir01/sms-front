@@ -16,11 +16,22 @@ import { useStatisticStore } from '@/stores/statistic';
 use([CanvasRenderer, BarChart, TitleComponent, GridComponent]);
 
 const statisticStore = useStatisticStore();
+const isLoading = ref(false);
+const filter = ref({
+  size: 10,
+  page: 1,
+  phoneNumber: "",
+  operator: null,
+  status: null,
+  merchant: null,
+  startDate: null,
+  endDate: null
+})
 
 const fetchByOperatorChart = async () => {
   isLoading.value = true
   try {
-    await statisticStore.fetchByOperatorChart({...filter.value})
+    await statisticStore.fetchByStatusChart()
   } finally {
     isLoading.value = false
   }
