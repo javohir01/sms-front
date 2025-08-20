@@ -2,16 +2,20 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import {
   byStatusChart,
+  byStatusWithDetailChart,
   byOperatorChart
-} from '@/api/statistic' 
+} from '@/api/statistic'
+import fixNanhai from "echarts/types/src/coord/geo/fix/nanhai";
 
 export const useStatisticStore = defineStore('statistic', () => {
-  const loading = ref(false)
   const error = ref(null)
-
   const fetchByStatusChart = async (params: any) => {
     const res = await byStatusChart(params)
-    return res.data
+    return res
+  }
+  const fetchByStatusWithDetailChart = async (params: any) => {
+    const res = await byStatusWithDetailChart(params)
+    return res
   }
 
   const fetchByOperatorChart = async (params: any) => {
@@ -19,9 +23,10 @@ export const useStatisticStore = defineStore('statistic', () => {
     return res.data
   }
   return {
-    loading,
     error,
     fetchByStatusChart,
+    fetchByStatusWithDetailChart,
     fetchByOperatorChart,
+
   }
 })

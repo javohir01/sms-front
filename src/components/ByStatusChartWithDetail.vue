@@ -1,18 +1,45 @@
+<template>
+  <div v-loading="isLoading">
+    <div class="">
+      <h1 class="statistic-section-title mr-3">Количество SMS по статусам</h1>
+      <el-date-picker
+        v-model="dateRange"
+        class="filter-date"
+        type="daterange"
+        range-separator=" - "
+        start-placeholder="Начало"
+        end-placeholder="Конец"
+        size="large"
+        format="YYYY-MM-DD"
+      />
+    </div>
+    <VChart :option="option" style="height: 300px;" />
+  </div>
+</template>
+
 <script setup>
-import { ref } from 'vue';
+import { ref, watch, computed, onMounted } from 'vue';
 import VChart from 'vue-echarts';
 import { use } from 'echarts/core';
 import { CanvasRenderer } from 'echarts/renderers';
 import { BarChart } from 'echarts/charts';
 import { TitleComponent, GridComponent } from 'echarts/components';
+import { useStatisticStore } from '@/stores/statistic';
+import { ElDatePicker } from 'element-plus'
+import {formatDateToIso} from "@/utils/helpers";
 
 use([CanvasRenderer, BarChart, TitleComponent, GridComponent]);
 
+const statisticStore = useStatisticStore();
+const isLoading = ref(false);
+const filter = ref({
+  startDate: null,
+  endDate: null
+})
+const dateRange = ref('')
+const data = ref(null);
+
 const option = ref({
-  title: {
-    text: 'Количество SMS по статусам',
-    left: 'left'
-  },
   xAxis: {
     type: 'category',
     data: ['Создано', 'Отправлено', 'Доставлено', 'Не доставлено', 'Ошибка', 'Отклонено', 'Не удалось', 'Создано', 'Состояно'],
@@ -55,10 +82,28 @@ const option = ref({
     }
   ]
 });
-</script>
 
-<template>
-  <div>
-    <VChart :option="option" style="height: 300px;" />
-  </div>
-</template>
+
+watch(dateRange, (newVal) => {
+  filter.value.startDate = newVal?.[0] ? formatDateToIso(newVal[0]) : null
+  filter.value.endDate   = newVal?.[1] ? formatDateToIso(newVal[1]) : null
+  fetchByOperatorChart()
+})
+const fetchByOperatorChart = async () => {
+  isLoading.value = true
+  try {
+    const res = await statisticStore.fetchByStatusWithDetailChart({...filter.value})
+    console.log('res?.data')
+    if (res?.data) {
+      console.log(res?.data)
+      data.value = res.data || {}
+    }
+  } finally {
+    isLoading.value = false
+  }
+}
+
+onMounted(() => {
+  fetchByOperatorChart()
+})
+</script>
