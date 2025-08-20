@@ -41,7 +41,7 @@
     <div class="table-container">
       <v-data-table
         :headers="headers"
-        :items="smsStore?.smses?.content"
+        :items="smsStore?.smsFrames?.content"
         :loading="smsStore.loading"
         :items-per-page="parseInt(filter.size)"
         :page.sync="filter.page"

@@ -14,16 +14,9 @@ export const useResourceStore = defineStore('resource', () => {
     loading.value = true
     try {
       const response = await allOperators()
-      if (response?.status === 200) {
-        console.log('Operatorlar muvaffaqiyatli olindi:', response.data)
-      } else {
-        console.error('Operatorlarni olishda xatolik:', response)
-      }
       if (response?.data) {
         operators.value = response.data || []
       }
-    } catch (err) {
-      console.error('Operatorlarni olishda xatolik:', err)
     } finally {
       loading.value = false
     }
@@ -32,16 +25,9 @@ export const useResourceStore = defineStore('resource', () => {
     loading.value = true
     try {
       const response = await allMerchants()
-      if (response?.status === 200) {
-        console.log('Operatorlar muvaffaqiyatli olindi:', response.data)
-      } else {
-        console.error('Operatorlarni olishda xatolik:', response)
-      }
       if (response?.data) {
         merchants.value = response.data || []
       }
-    } catch (err) {
-      console.error('Operatorlarni olishda xatolik:', err)
     } finally {
       loading.value = false
     }

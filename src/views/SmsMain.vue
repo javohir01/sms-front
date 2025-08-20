@@ -57,15 +57,18 @@
           <span class="transaction-id">{{ item.id }}</span>
         </template>
 
-        <template #item.comment="{ item }">
-          <span class="comment-text">{{ item.comment }}</span>
+        <template #item.merchantName="{ item }">
+          <span class="comment-text">{{ item.merchantName }}</span>
         </template>
-        <template #item.isManual="{ item }">
-          {{ item.isManual ? 'Ручное' : 'Автоматическое' }}
+        <template #item.userId="{ item }">
+          {{ item.userId }}
         </template>
 
-        <template #item.amount="{ item }">
-          <span class="amount-text">{{ item.amount }}</span>
+        <template #item.originator="{ item }">
+          <span class="amount-text">{{ item.originator }}</span>
+        </template>
+        <template #item.phoneNumber="{ item }">
+          <span class="amount-text">{{ item.phoneNumber }}</span>
         </template>
         <template #item.status="{ item }">
           <v-chip
@@ -75,7 +78,7 @@
             variant="flat"
             style="border-radius: 6px;"
           >
-            {{ item.status }}
+            {{ getStatus(item.status) }}
           </v-chip>
         </template>
         <template #item.createdDate="{ item }">
@@ -85,15 +88,15 @@
           </div>
         </template>
       </v-data-table>
-        <v-btn
-          color="primary"
-          variant="flat"
-          class="export-btn"
-          prepend-icon="mdi-export"
-          @click="exportSms"
-        >
-          Экспорт
-        </v-btn>
+      <v-btn
+        color="primary"
+        variant="flat"
+        class="export-btn"
+        prepend-icon="mdi-export"
+        @click="exportSms"
+      >
+        Экспорт
+      </v-btn>
       <div class="d-flex justify-space-between mt-4 ml-4 mb-2">
         <div class="d-flex align-center" style="gap:8px">
           <span class="pagination-text">Показано</span>
@@ -256,7 +259,7 @@ watch(dateRange, (newVal) => {
 const fetchSms = async () => {
   isLoading.value = true
   try {
-    await smsStore.fetchSmses({...filter.value})
+    await smsStore.fetchSmses({...filter.value, page: filter.value.page - 1 })
   } finally {
     isLoading.value = false
   }
@@ -294,7 +297,6 @@ function clearFilter() {
   filter.value.startDate = null
   filter.value.endDate = null
   filter.value.phoneNumber = ''
-  // showFilterModal.value = false
 }
 const exportSms = () => {
   isLoading.value = true
@@ -303,7 +305,6 @@ const exportSms = () => {
     if (res) {
       const blob = new Blob([res], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
       const url = window.URL.createObjectURL(blob);
-
       const a = document.createElement('a');
       a.href = url;
       a.download = 'sms.xlsx';
@@ -316,28 +317,41 @@ const exportSms = () => {
 }
 const getStatusColor = (status: string) => {
     switch (status) {
-      case 'CREATED': return '#DDF7FB'
+      case 'CREATED': return '#FFF2DD'
       case 'FAILED': return '#FEF2F2'
       case 'NOT_FOUND': return '#FEF2F2'
-      case 'EXPIRED': return '#F7EFFF'
-      case 'TRANSMITTED': return '#EFF6FF'
-      case 'DELIVERED': return '#EFF6FF'
-      case 'REJECTED': return '#EFFBD5'
-      case 'NOT_DELIVERED': return '#FFEBE1'
+      case 'EXPIRED': return '#FEF2F2'
+      case 'TRANSMITTED': return '#E2FBE8'
+      case 'DELIVERED': return '#E2FBE8'
+      case 'REJECTED': return '#E2FBE8'
+      case 'NOT_DELIVERED': return '#E2FBE8'
       default: return '#E2E3E5'
     }
   }
 const getChipStyle = (status: string) => {
   switch (status) {
-    case 'CREATED': return 'color: #1B3822';
-    case 'FAILED': return 'color: #B17700'
+    case 'CREATED': return 'color: #B17700';
+    case 'FAILED': return 'color: #DC2626'
     case 'NOT_FOUND': return 'color: #DC2626'
-    case 'EXPIRED': return 'color: #000000'
-    case 'TRANSMITTED': return 'color: #2563EB'
-    case 'DELIVERED': return '#EFF6FF'
-    case 'REJECTED': return '#EFFBD5'
-    case 'NOT_DELIVERED': return '#FFEBE1'
-    default: return '#E2E3E5'
+    case 'EXPIRED': return 'color: #DC2626'
+    case 'TRANSMITTED': return 'color: #1B3822'
+    case 'DELIVERED': return 'color: #1B3822'
+    case 'REJECTED': return 'color: #1B3822'
+    case 'NOT_DELIVERED': return 'color: #1B3822'
+    default: return 'color: #1B3822'
+  }
+};
+const getStatus = (status: string) => {
+  switch (status) {
+    case 'CREATED': return 'Новый';
+    case 'FAILED': return 'Неуспешно'
+    case 'NOT_FOUND': return 'Неуспешно'
+    case 'EXPIRED': return 'Неуспешно'
+    case 'TRANSMITTED': return 'Успешно'
+    case 'DELIVERED': return 'Успешно'
+    case 'REJECTED': return 'Успешно'
+    case 'NOT_DELIVERED': return 'Успешно'
+    default: return status
   }
 };
 
