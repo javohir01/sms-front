@@ -293,7 +293,7 @@ function clearFilter() {
 const exportSms = () => {
   isLoading.value = true
   const f = {...filter}
-  smsStore.smsExport({...filter.value}).then((res) => {
+  smsStore.smsFrameExport({...filter.value}).then((res) => {
     if (res) {
       const blob = new Blob([res], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
       const url = window.URL.createObjectURL(blob);

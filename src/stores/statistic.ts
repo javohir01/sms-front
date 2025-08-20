@@ -1,11 +1,9 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import {
-  sms,
-  smsFrame,
-  exportSms,
-  exportSmsFrame
-} from '@/api/sms' 
+  byStatusChart,
+  byOperatorChart
+} from '@/api/statistic' 
 
 export const useSmsStore = defineStore('sms', () => {
   const smses = ref({})
