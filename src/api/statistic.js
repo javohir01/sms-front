@@ -9,7 +9,7 @@ export async function byStatusChart(params) {
 }
 export async function byStatusWithDetailChart(params) {
   return axiosInstance({
-    url: `/v1/summary-result-by-all-status`,
+    url: `/report/sms/summary-result-by-all-status`,
     method: 'GET',
     params
   })

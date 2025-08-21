@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { ref,reactive } from 'vue'
 import {
   sms,
   smsFrame,
@@ -12,7 +12,16 @@ export const useSmsStore = defineStore('sms', () => {
   const smsFrames = ref({})
   const loading = ref(false)
   const error = ref(null)
-
+  const statuses = reactive({
+    'CREATED': 'Создано',
+    'FAILED': 'Ошибка',
+    'NOT_FOUND': 'Не удалось',
+    'EXPIRED': 'Истекло',
+    'TRANSMITTED': 'Отправлено',
+    'DELIVERED': 'Доставлено',
+    'REJECTED': 'Отклонено',
+    'NOT_DELIVERED': 'Не доставлено'
+  })
   const fetchSmses = async (params: any) => {
     loading.value = true
     try {
@@ -53,6 +62,7 @@ export const useSmsStore = defineStore('sms', () => {
     error,
     smses,
     smsFrames,
+    statuses,
     fetchSmses,
     fetchSmsFrames,
     smsExport,

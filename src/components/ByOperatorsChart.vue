@@ -39,43 +39,6 @@ const filter = ref({
 const dateRange = ref('')
 let data = reactive(null);
 const totalCount = ref(null);
-// const option = computed(() => {
-//   const stats = data.value || { successCount: 0, unsuccessCount: 0 };
-//   const total = data.value?.all ?? 0;
-//   return {
-//     series: [
-//       {
-//         name: 'успешно',
-//         type: 'bar',
-//         stack: 'total',
-//         data: [stats.successCount || 0],
-//         label: {
-//           show: true,
-//           position: 'inside',
-//           formatter: `${stats.successCount || 0} успешно`,
-//         },
-//         itemStyle: {
-//           color: '#98FB98',
-//         },
-//       },
-//       {
-//         name: 'неуспешно',
-//         type: 'bar',
-//         stack: 'total',
-//         data: [stats.unsuccessCount || 0],
-//         label: {
-//           show: true,
-//           position: 'inside',
-//           formatter: `${stats.unsuccessCount || 0} неуспешно`,
-//         },
-//         itemStyle: {
-//           color: '#FFC0CB',
-//         },
-//       },
-//     ],
-//   };
-// });
-
 const option = computed(() => {
   let stats = {
     UCELL: 0,

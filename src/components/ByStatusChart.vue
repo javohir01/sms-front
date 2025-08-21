@@ -133,7 +133,7 @@ onMounted(() => {
 .filter-date{
   border-radius: 10px;
   border: none!important;
-  //box-shadow: none !important;
+  box-shadow: none !important;
   margin-left: 25px;
 }
 </style>

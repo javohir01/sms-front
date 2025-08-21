@@ -127,7 +127,7 @@
       </div>
     </div>
     <!-- Filter Modal -->
-     <el-dialog v-model="showFilterModal" width="360px" custom-class="filter-dialog">
+    <el-dialog v-model="showFilterModal" width="360px" custom-class="filter-dialog">
       <template #header>
         <div class="filter-header">
           <span>Фильтры</span>
@@ -199,7 +199,6 @@
 
 <script setup lang="ts">
 import { ref, h, watch, onMounted } from 'vue'
-import { ElDatePicker, ElInput, ElButton, ElDialog } from 'element-plus'
 import {useSmsStore} from "@/stores/sms";
 import {useResourceStore} from "@/stores/resource";
 import {formatDateToIso} from "@/utils/helpers";
@@ -300,20 +299,20 @@ function clearFilter() {
 }
 const exportSms = () => {
   isLoading.value = true
-  const f = {...filter}
-  smsStore.smsExport().then((res) => {
-    if (res) {
-      const blob = new Blob([res], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'sms.xlsx';
-      a.click();
-      window.URL.revokeObjectURL(url);
-    }
-  }).finally(() => {
-    isLoading.value = false
-  })
+  smsStore.smsExport({...filter.value, page: filter.value.page - 1 })
+    .then((res) => {
+      if (res) {
+        const blob = new Blob([res], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'sms.xlsx';
+        a.click();
+        window.URL.revokeObjectURL(url);
+      }
+    }).finally(() => {
+      isLoading.value = false
+    })
 }
 const getStatusColor = (status: string) => {
     switch (status) {
