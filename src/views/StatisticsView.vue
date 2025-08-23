@@ -1,7 +1,7 @@
 <template>
   <v-container fluid class="statistics-container">
     <ByStatusChart />
-    <!-- <ByStatusChartWithDetail /> -->
+    <ByStatusChartWithDetail />
     <ByOperatorsChart />
   </v-container>
 </template>

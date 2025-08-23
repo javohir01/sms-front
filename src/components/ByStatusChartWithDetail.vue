@@ -52,7 +52,8 @@ const option = computed(() => {
   }
   console.log('statisticStore.statuses')
   console.log(statisticStore.statuses)
-  let statusNames = Object.values(statisticStore.statuses);
+   
+  let statusNames = statisticStore.statuses ? Object.values(statisticStore.statuses) : [];
   return {
     xAxis: {
       type: 'category',
